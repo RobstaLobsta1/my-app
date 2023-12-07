@@ -1,38 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Box,
-  Typography,
   TextField,
   Button,
   useTheme,
-  MenuItem, // Import MenuItem for Select component
-  Select, // Import Select component
-} from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
-import { tokens } from '../../theme';
-import Header from '../../components/Header';
-import { mockDataInvoices } from "../../data/mockData";
+  MenuItem,
+  Select,
+} from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
+import { tokens } from "../../theme";
+import Header from "../../components/Header";
+import {
+  client,
+  getExpenses,
+  createExpense,
+  deleteExpense,
+} from "../../lib/pocketbase";
 
 const spendingCategories = [
-  'Food',
-  'Transportation',
-  'Housing',
-  'Entertainment',
-  'Utilities',
-  'Others',
+  "Food",
+  "Transportation",
+  "Housing",
+  "Entertainment",
+  "Utilities",
+  "Others",
 ];
 
 const Invoices = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  // Mock data for the expenses
-  const [expenses, setExpenses] = useState(mockDataInvoices);
+  // State to hold the fetched expenses
+  const [expenses, setExpenses] = useState([]);
 
-  // State to hold user input for expense details
-  const [expenseName, setExpenseName] = useState('');
-  const [expenseValue, setExpenseValue] = useState('');
-  const [expenseCategory, setExpenseCategory] = useState('');
+  // Fetch all data from the 'expenses' collection in PocketBase
+  useEffect(() => {
+    getExpenses().then((res) => setExpenses(res));
+  }, []);
+
+  // Rest of the component logic for handling expense inputs and display
+  const [expenseName, setExpenseName] = useState(null);
+  const [expenseValue, setExpenseValue] = useState(null);
+  const [expenseCategory, setExpenseCategory] = useState(null);
 
   const handleNameChange = (event) => {
     setExpenseName(event.target.value);
@@ -46,39 +56,41 @@ const Invoices = () => {
     setExpenseCategory(event.target.value);
   };
 
-  const handleAddExpense = () => {
-    // Creating a new expense object with the entered values
-    const newExpense = {
-      id: expenses.length + 1,
-      name: expenseName,
-      cost: parseFloat(expenseValue),
-      category: expenseCategory,
-      // You might add other fields like date, etc., as needed
-    };
+  const handleAddExpense = async () => {
+    try {
+      const newExpense = await createExpense(
+        expenseName,
+        parseFloat(expenseValue),
+        expenseCategory
+      );
 
-    // Adding the new expense to the expenses array
-    setExpenses([...expenses, newExpense]);
-
-    // Clearing the input fields after adding an expense
-    setExpenseName('');
-    setExpenseValue('');
-    setExpenseCategory('');
+      setExpenses([...expenses, newExpense]);
+      setExpenseName("");
+      setExpenseValue("");
+      setExpenseCategory("");
+    } catch (error) {
+      console.error("Error adding expense:", error);
+    }
+    window.location.reload();
   };
 
-  const handleDeleteExpense = (id) => {
-    // Filtering out the expense with the given ID
-    const updatedExpenses = expenses.filter((expense) => expense.id !== id);
-    setExpenses(updatedExpenses);
+  const handleDeleteExpense = async (id) => {
+    deleteExpense(id)
   };
 
   const columns = [
-    { field: 'id', headerName: 'ID', flex: 1 },
-    { field: 'name', headerName: 'Name', flex: 1 },
-    { field: 'cost', headerName: 'Cost', flex: 1 },
-    { field: 'category', headerName: 'Category', flex: 1 },
+    { field: "id", headerName: "ID", flex: 1 },
+    { field: "name", headerName: "Name", flex: 1 },
+    { field: "amount", headerName: "Cost", flex: 1 },
     {
-      field: 'actions',
-      headerName: 'Actions',
+      field: "category",
+      headerName: "Category",
+      flex: 1,
+      valueGetter: (params) => params.row.category || "N/A",
+    }, // Display 'N/A' if category is undefined
+    {
+      field: "actions",
+      headerName: "Actions",
       flex: 1,
       renderCell: (params) => (
         <Button
@@ -95,8 +107,7 @@ const Invoices = () => {
 
   return (
     <Box m="20px">
-      <Header title="EXPENSES" subtitle="List of Expenses" />
-      {/* Input fields for adding new expenses */}
+      <Header title="EXPENSES" subtitle="Your Expenses" />
       <Box
         display="flex"
         alignItems="center"
@@ -125,7 +136,7 @@ const Invoices = () => {
           variant="outlined"
           displayEmpty
           fullWidth
-          renderValue={(selected) => (selected ? selected : 'Category')}
+          renderValue={(selected) => (selected ? selected : "Category")}
         >
           <MenuItem disabled value="">
             Category
@@ -136,22 +147,20 @@ const Invoices = () => {
             </MenuItem>
           ))}
         </Select>
-        <Button variant="contained" color="primary" onClick={handleAddExpense}>
+        <Button variant="contained" color="secondary" onClick={handleAddExpense}>
           Add Expense
         </Button>
       </Box>
 
-      {/* DataGrid to display the expenses */}
       <Box
         height="calc(100vh - 280px)"
-        sx={{
-          // Styles for DataGrid...
-        }}
+        sx={
+          {
+            // Styles for DataGrid...
+          }
+        }
       >
-        <DataGrid
-          rows={expenses}
-          columns={columns}
-        />
+        <DataGrid rows={expenses} columns={columns} />
       </Box>
     </Box>
   );

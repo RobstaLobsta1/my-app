@@ -77,7 +77,7 @@ const Sidebar = () => {
                 ml="15px"
               >
                 <Typography variant="h3" color={colors.grey[100]}>
-                  ADMINIS
+                  MENU
                 </Typography>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon />
@@ -99,9 +99,7 @@ const Sidebar = () => {
                   color={colors.grey[100]}
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
-                >
-                  Ed Roh
-                </Typography>          
+                ></Typography>
               </Box>
             </Box>
           )}
@@ -137,7 +135,7 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
             <Item
-              title="Invoices Balances"
+              title="Expenses"
               to="/invoices"
               icon={<ReceiptOutlinedIcon />}
               selected={selected}
