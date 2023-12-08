@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { ResponsivePie } from "@nivo/pie";
 import { tokens } from "../theme";
 import { useTheme } from "@mui/material";
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import {
   client,
   getExpenses,
