@@ -1,14 +1,43 @@
+import React, { useState, useEffect } from "react";
 import { ResponsivePie } from "@nivo/pie";
 import { tokens } from "../theme";
 import { useTheme } from "@mui/material";
-import { mockPieData as data } from "../data/mockData";
+import {
+  client,
+  getExpenses,
+  createExpense,
+  deleteExpense,
+} from "../lib/pocketbase";
 
 const PieChart = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  const [expensesData, setExpensesData] = useState([]);
+
+  useEffect(() => {
+    fetchExpenses();
+  }, []);
+
+  const fetchExpenses = async () => {
+    try {
+      const expenses = await getExpenses();
+      setExpensesData(expenses);
+    } catch (error) {
+      console.error("Error fetching expenses:", error);
+    }
+  };
+
+  // Format expenses data for the pie chart
+  const formattedData = expensesData.map((expense) => ({
+    id: expense.name,
+    label: expense.category, // Use 'category' or appropriate key from expenses data
+    value: expense.amount, // Use 'amount' or appropriate key from expenses data
+  }));
+
   return (
     <ResponsivePie
-      data={data}
+      data={formattedData}
       theme={{
         axis: {
           domain: {
