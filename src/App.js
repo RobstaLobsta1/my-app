@@ -5,6 +5,7 @@ import Sidebar from "./scenes/global/Sidebar";
 import Dashboard from "./scenes/dashboard";
 import Invoices from "./scenes/invoices";
 import Pie from "./scenes/pie";
+import Form from "./scenes/form";
 
 //import Geography from "./scenes/geography";
 import { CssBaseline, ThemeProvider } from "@mui/material";
@@ -25,7 +26,8 @@ function App() {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/invoices" element={<Invoices />} />           
-              <Route path="/pie" element={<Pie />} />         
+              <Route path="/pie" element={<Pie />} />
+              <Route path="/form" element={<Form />} />         
             </Routes>
           </main>
         </div>
