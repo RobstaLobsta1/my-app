@@ -19,3 +19,19 @@ export async function deleteExpense(id)
     await client.collection("expenses").delete(id);
     window.location.reload();
 }
+
+export async function register(data) {
+    console.log(data)
+    client.collection('users')
+    .create(data)
+    .catch((err) => {
+        console.log(err)
+    })
+}
+
+export async function login(data) {
+    const authData = await client
+      .collection("users")
+      .authWithPassword(data.email, data.password);
+  }
+
