@@ -8,13 +8,13 @@ import {
   Select,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { tokens } from "../../theme";
-import Header from "../../components/Header";
+import { tokens } from "../theme";
+import Header from "../components/Header";
 import {
   getExpenses,
   createExpense,
   deleteExpense,
-} from "../../lib/pocketbase";
+} from "../lib/pocketbase";
 
 const spendingCategories = [
   "Food",
@@ -25,7 +25,7 @@ const spendingCategories = [
   "Others",
 ];
 
-const Invoices = () => {
+const Expenses = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -105,7 +105,7 @@ const Invoices = () => {
 
   return (
     <Box m="20px">
-      <Header title="EXPENSES" subtitle="Your Expenses" />
+      <Header subtitle="Input your expenses here" />
       <Box
         display="flex"
         alignItems="center"
@@ -164,4 +164,4 @@ const Invoices = () => {
   );
 };
 
-export default Invoices;
+export default Expenses;
