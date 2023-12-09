@@ -6,7 +6,6 @@ export const client = new PocketBase(url)
 
 client.autoCancellation(false);
 
-await client.admins.authWithPassword('gylondaddi@yahoo.com', '123123123');
 
 
 export async function getExpenses() {
@@ -27,28 +26,24 @@ export async function deleteExpense(id)
 export async function register(data) {
     try {
         await client.collection('users').create(data)
+        await client.collection("users").authWithPassword(data.email, data.password);
+        alert("User successfully created")
     } catch (e) {
-        console.error("email invalid or in use already")
+        alert(e)
     }   
 }
 
-export const isLoggedIn = client.authStore.isValid
-
-// const initialValues = {
-//     firstName: "",
-//     lastName: "",
-//     email: "",
-//     contact: "",
-//     password: "",
-//     confirmPassword: "",
-//   };
-
 export async function Login(data) {
-    const authData = await client
-      .collection("users")
-      .authWithPassword(data.email, data.password);
-
-
+    console.log(data)
+    try {
+        const authData = await client
+            .collection("users")
+            .authWithPassword(data.email, data.password);
+        
+    } catch (e){
+        alert("Error, invalid login")
+    }
   }
+
 
 

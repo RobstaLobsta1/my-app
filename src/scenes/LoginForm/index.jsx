@@ -3,31 +3,49 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
-import { Login } from "../../lib/pocketbase";
-import { isLoggedIn } from "../../lib/pocketbase";
+import { client } from "../../lib/pocketbase";
+import { useState } from "react";
 
 
 const LoginForm = () => {
+  const isLoggedIn = client.authStore.isValid;  
   const isNonMobile = useMediaQuery("(min-width:600px)");
+  const [X, setX] = useState(0) // to refresh on logout and login
+
+  function Logout() {
+    client.authStore.clear();
+    setX(Math.random())
+    console.log(isLoggedIn)
+  }
+  async function Login(data) {
+    try {
+        const authData = await client
+            .collection("users")
+            .authWithPassword(data.email, data.password);
+    } catch (e){
+        alert("Error, invalid login")
+    }
+  }
 
   const handleFormSubmit = (values) => {
-    if (!isLoggedIn) {
       Login(values);
-    }
+      setX(Math.random())
   };
 
   if (isLoggedIn) {
     return (
-      <div>
-        <Header title="You are logged in"/>
-      </div>
+      <Box>
+        <Header title="Logged in as" />
+        <Button onClick={Logout} color="secondary" variant="contained">
+          Log Out
+        </Button>
+      </Box>
     )
   }
 
-  if (!isLoggedIn) {
   return (
     <Box m="20px">
-      <Header title="Login" subtitle="Login with email and password" />
+      <Header title="Login" subtitle="Press the login button twice :)" />
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -89,7 +107,6 @@ const LoginForm = () => {
     </Box>
   );
 };
-}
 
 const checkoutSchema = yup.object().shape({
   email: yup.string().email("invalid email").required("required"),
